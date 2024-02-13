@@ -1,0 +1,20 @@
+var ScanChars = require('scanner.ScanChars')
+var ScanMinusSign = require('scanner.ScanMinusSign')
+
+class Scanner(file)
+
+    method scanFile()
+        var word = {}
+        var allWords = {}
+        var currentScannerMode <mutable> = ScanChars
+        for char in gmatch(self.file.text,"." ) do
+            currentScannerMode =  currentScannerMode:parseInput(word,char,allWords)
+        end
+        ScanChars:createNewWord(word,alWords)
+    end
+
+    constructor(file)
+        self.file = file
+    end
+
+endClass

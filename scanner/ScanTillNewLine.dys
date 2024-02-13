@@ -1,0 +1,11 @@
+var ScanChars = require('scanner.ScanChars')
+
+class SkipTillNewLine() :> ScanChars
+
+method parseInput(word,char,allWords)
+	if char ~= "\n" then return addToTable(char,word) end
+	addCharToWordThenCreateNewWord(word,char,allWords)
+	return ScanChars
+end
+
+endClass

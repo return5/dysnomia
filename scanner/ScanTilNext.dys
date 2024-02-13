@@ -1,0 +1,26 @@
+var ScanChars = require('scanner.ScanChars')
+
+class ScanTilNext(endingChars) :> ScanChars
+
+method firstInput(word,char,allWords)
+	return breakWordThenAddCharToWord(word,char,allWords)
+end
+
+method parseEndingChar(word,char,allWords)
+	addCharToWordThenCreateNewWord(word,char,allWords)
+	return ScanChars
+end
+
+method parseNotEndingChar(word,char,allWords)
+	createNewWord(word,allWords)
+	return ScanChars:parseInput(word,char,allWords)
+end
+
+method parseInput(word,char,allWords)
+	if self.endingChars[char] then
+		return parseEndingChar(word,char,allWords)
+	end
+	return parseNotEndingChar(word,char,allWords)
+end
+
+endClass

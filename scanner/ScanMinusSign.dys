@@ -1,0 +1,23 @@
+var ScanTilNext = require('scanner.ScanTilNext')
+var ScanTIllNewLine = require('scanner.ScanTillNewLine')
+
+class ScanMinusSign() :> ScanTilNext
+
+method parseInput(word,char,allWords)
+	if self.endingChars[char] then
+		return parseEndingChar(word,char,allWords)
+	end
+	if char == self.commentChar then
+		addToTable(char,word)
+		return ScanTIllNewLine
+	end
+	return parseNotEndingChar(word,char,allWords)
+end
+
+constructor()
+    super({["="] = true, [">"] = true})
+	self.commentChar = "-"
+end
+
+
+endClass

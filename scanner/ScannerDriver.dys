@@ -1,0 +1,40 @@
+var ScanToEndingChar = require('scanner.ScanToEndingChar')
+var ScanSpaces = require('scanner.ScanSpaces')
+var ScanTilNext = require('scanner.ScanTilNext')
+var ScanMinusSign = require('scanner.ScanMinusSign')
+var ScanChars = require('scanner.ScanChars')
+
+class ScannerDriver()
+
+    var scanToSingleQuote = ScanToEndingChar:new("'")
+    var scanToDoubleQuote = ScanToEndingChar:new('"')
+    var scanTilEqualSign = ScanTilNext:new({['='] = true})
+    var scanMinusSign = ScanMinusSign:new()
+
+    method scanSingleQuote(word,char)
+        return scanToSingleQuote:openingChar(word,char)
+    end
+
+    method scanDoubleQuote(word,char)
+        return scanToDoubleQuote:openingChar(word,char)
+    end
+
+    method scanSpaces(word,char,allWords)
+        return ScanSpaces:scanFirstSpace(word,char,allWords)
+    end
+
+    method scanMathOps(word,char,allWords)
+        return scanTilEqualSign:firstInput(word,char,allWords)
+    end
+
+    method scanMinusSign(word,char,allWords)
+        return scanMinusSign:firstInput(word,char,allWords)
+    end
+
+    local function postConstruct()
+        ScanChars.initScannerDriver(ScannerDriver)
+    end
+
+    postConstruct()
+
+endClass

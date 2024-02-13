@@ -1,0 +1,20 @@
+var ScanChars = require('scanner.ScanChars')
+
+class ScanSpaces() :> ScanChars
+
+method scanFirstSpace(word,char,allWords)
+	breakWordThenAddCharToAllWords(word,char,allWords)
+	return self
+end
+
+method parseInput(word,char,allWords)
+	if not self.spaceChars[char] then
+		createNewWord(word,allWords)
+		return ScanChars:parseInput(word,char,allWords)
+	end
+	addToTable(char,word)
+	return self
+end
+
+
+endClass

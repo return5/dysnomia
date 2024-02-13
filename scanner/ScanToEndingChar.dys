@@ -1,0 +1,19 @@
+var ScanChars = require('scanner.ScanChars')
+
+class ScanToEndingChar(endingChar) :> ScanChars
+
+method openingChar(word,char)
+	addToTable(char,word)
+	return self
+end
+
+method parseInput(word,char,allWords)
+	if not checkIfCharIsEscaped(word) and char == self.endingChar then
+		addCharToWordThenCreateNewWord(word,char,allWords)
+		return ScanChars
+	end
+	addToTable(char,word)
+	return self
+end
+
+endClass

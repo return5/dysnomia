@@ -1,0 +1,114 @@
+class ScanChars()
+    var remove = table.remove
+    var concat = table.concat
+    var pairs = pairs
+
+ScanChars.spaceChars = {
+	[" "] = true,
+	["\t"] = true
+}
+
+method scanMinusSign(word,char,allWords)
+	return self.ScannerDriver:scanMinusSign(word,char,allWords)
+end
+
+method scanMathOps(word,char,allWords)
+	return self.ScannerDriver:scanMathOps(word,char,allWords)
+end
+
+method scanSpaces(word,char,allWords)
+	return self.ScannerDriver:scanSpaces(word,char,allWords)
+end
+
+method scanDoubleQuote(word,char)
+	return self.ScannerDriver:scanDoubleQuote(word,char)
+end
+
+method scanSingleQuote(word,char)
+	return self.ScannerDriver:scanSingleQuote(word,char)
+end
+
+method checkIfEndOfWordMatches(word,char)
+	return word[#word] == char
+end
+
+method checkIfCharIsEscaped(word)
+	return word[#word] == "\\" and word[#word - 1] ~= "\\"
+end
+
+method clearWord(word)
+	while #word > 0 do
+		remove(word)
+	end
+	return self
+end
+
+method addToTable(item,table)
+	table[#table + 1] = item
+	return self
+end
+
+method addCharToWordThenCreateNewWord(word,char,allWords)
+	addToTable(char,word)
+	createNewWord(word,allWords)
+	return self
+end
+
+method createNewWord(word,allWords)
+	if #word > 0 then
+		addToTable(concat(word),allWords)
+		clearWord(word)
+	end
+	return self
+end
+
+method breakWordThenAddCharToAllWords(word,char,allWords)
+	createNewWord(word,allWords)
+	addToTable(char,allWords)
+	return self
+end
+
+method breakWordThenAddCharToWord(word,char,allWords)
+	createNewWord(word,allWords)
+	addToTable(char,word)
+	return self
+end
+
+local scanTbl <const> = {
+	[","] = ScanChars.breakWordThenAddCharToAllWords,
+	[")"] = ScanChars.breakWordThenAddCharToAllWords,
+	["("] = ScanChars.breakWordThenAddCharToAllWords,
+	["]"] = ScanChars.breakWordThenAddCharToAllWords,
+	["["] = ScanChars.breakWordThenAddCharToAllWords,
+	["{"] = ScanChars.breakWordThenAddCharToAllWords,
+	["}"] = ScanChars.breakWordThenAddCharToAllWords,
+	[";"] = ScanChars.breakWordThenAddCharToAllWords,
+	["<"] = ScanChars.breakWordThenAddCharToAllWords,
+	[">"] = ScanChars.breakWordThenAddCharToAllWords,
+	["\n"] = ScanChars.breakWordThenAddCharToAllWords,
+	["-"] = ScanChars.scanMinusSign,
+	["+"] = ScanChars.scanMathOps,
+	["/"] = ScanChars.scanMathOps,
+	["*"] = ScanChars.scanMathOps,
+	["="] = ScanChars.breakWordThenAddCharToAllWords,
+	["'"] = ScanChars.scanSingleQuote,
+	['"'] = ScanChars.scanDoubleQuote
+}
+
+for k in pairs(ScanChars.spaceChars) do
+	scanTbl[k] = ScanChars.scanSpaces
+end
+
+method parseInput(word,char,allWords)
+	if scanTbl[char] then
+		return scanTbl[char](self,word,char,allWords)
+	end
+	addToTable(char,word)
+	return self
+end
+
+method initScannerDriver(scannerDriver)
+	ScanChars.ScannerDriver = scannerDriver
+end
+
+endClass
