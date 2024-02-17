@@ -15,6 +15,7 @@ method parseInput(word,char,allWords)
 end
 
 constructor()
+--TODO fix this
     super({["="] = true, [">"] = true})
 	self.commentChar = "-"
 end
