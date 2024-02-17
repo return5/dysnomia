@@ -1,0 +1,78 @@
+var ClassAndRecordParser = require('parser.classandrecord.ClassAndRecordParser')
+var Class = require('parser.classandrecord.Class')
+
+class RecordParser() :> ClassAndRecordParser
+
+method writeEndRecord(parserParams)
+	parserParams:getDysText():writeFiveArgs("\treturn setmetatable({},{__index = ",self.classOrRecordName,
+			",__newindex = function() end,__len = function() return #",self.classOrRecordName," end})\nend")
+	return self
+end
+
+method handleRecordName(parserParams)
+	var newI = loopUntilMatch(parserParams,parserParams:getI() + 1,"%S",self.doNothing)
+	self.originalRecordName = parserParams:getAt(newI)
+	self.classOrRecordName = "__" .. self.originalRecordName .. "__"
+	parserParams:getDysText():writeThreeArgs("function ",self.originalRecordName,"(")
+	return newI
+end
+
+method parseParams(index,parserParams)
+	var openParens = loopUntilMatch(parserParams,index,"%(",self.doNothing)
+	var closeParens = loopUntilMatchParams(parserParams,openParens + 1,"%)",self:returnFunctionAddingTextToParams(self.params))
+	return closeParens
+end
+local function writeFinalAssigmentOfParams(dysText,param)
+	dysText:writeFourArgs(param," = ",param,"}\n")
+end
+
+local function writeFinalRecordParam(dysText,param)
+	dysText:writeTwoArgs(param,")\n")
+end
+
+method writeRecordFunctionParams(parserParams)
+	var dysText = parserParams:getDysText()
+	writeParamsToDysText(dysText,self.params,self.writeParamAndCommaToDysText,writeFinalRecordParam)
+	return self
+end
+
+method writeLocalRecordVar(parserParams)
+	var dysText = parserParams:getDysText()
+	dysText:writeThreeArgs("\tvar ",self.classOrRecordName," = {")
+	writeParamsToDysText(dysText,self.params,self.writeAssignmentOfParams,writeFinalAssigmentOfParams)
+	return self
+end
+
+method createClassObject()
+	var klass = Class:new(self.classOrRecordName,self.params,parent)
+	self.class = klass
+	return self
+end
+
+method startParsingRecord(parserParams)
+	var nameI = handleRecordName(parserParams)
+	var closingParens = parseParams(nameI + 1,parserParams)
+	createClassObject()
+	writeRecordFunctionParams(parserParams)
+	writeLocalRecordVar(parserParams)
+	parserParams:updateSetI(self,closingParens + 1)
+	return self
+end
+
+method startParsingLocalRecord(parserParams)
+	parserParams:getDysText():write('local ')
+	startParsingRecord(parserParams)
+	return self
+end
+
+method parseEndRec(parserParams)
+	writeEndRecord(parserParams)
+	secondPass(parserParams,self.originalRecordName)
+	parserParams:update(self.returnMode,1)
+	return self
+end
+
+RecordParser.tokenFuncs['endRec'] = RecordParser.parseEndRec
+
+
+endClass

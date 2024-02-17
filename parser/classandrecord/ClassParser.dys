@@ -1,0 +1,228 @@
+var Class = require('parser.classandrecord.Class')
+var ClassAndRecordParser = require('parser.classandrecord.ClassAndRecordParser')
+
+class ClassParser(returnMode,startI) :> ClassAndRecordParser
+
+ClassParser.classes = {}
+
+method grabClassParameters(parserParams,startI)
+	var openParen = loopUntilMatch(parserParams,startI,"%(",self.doNothing)
+	var closingParens = loopUntilMatchParams(parserParams,openParen + 1,"%)",self:returnFunctionAddingTextToParams(self.params))
+	return closingParens
+end
+
+method grabClassParentName(parserParams,startingIndex)
+	var nextI = loopUntilMatch(parserParams,startingIndex + 1, "%S",self.doNothing)
+	if parserParams:getAt(nextI) == ">"  then
+		var parentI = loopUntilMatch(parserParams,nextI + 1, "%S",self.doNothing)
+		self.parentName = parserParams:getAt(parentI)
+		return parentI + 1
+	end
+	return nextI
+end
+
+method grabClassParentIfItExists(parserParams,startingI)
+	var newI = loopUntilMatch(parserParams,startingI,"[%S\n]",self.doNothing)
+	if parserParams:getAt(newI) == ":"then
+		return grabClassParentName(parserParams,newI)
+	end
+	return newI
+end
+
+method grabClassName(parserParams)
+	var nameI = loopUntilMatch(parserParams,parserParams:getI() + 1,"%S",self.doNothing)
+	self.classOrRecordName = parserParams:getAt(nameI)
+	return nameI
+end
+
+method setClass()
+	var parent = ClassParser.classes[self.parentName]
+	var klass = Class:new(self.classOrRecordName,self.params,parent)
+	ClassParser.classes[self.classOrRecordName] = klass
+	self.class = klass
+	return self
+end
+
+method startParsingClass(parserParams)
+	var openParens = grabClassName(parserParams)
+	var closingParens = grabClassParameters(parserParams,openParens + 1)
+	var startOfClass = grabClassParentIfItExists(parserParams,closingParens + 1)
+	setClass()
+	writeStartOfClass(parserParams)
+	parserParams:updateSetI(self,startOfClass)
+	return self
+end
+
+method writeStartOfClass(parserParams)
+	parserParams:getDysText()
+			:writeFiveArgs("\nvar setmetatable = setmetatable\nlocal ",self.classOrRecordName," <const> = {__className = '",self.classOrRecordName,"'}\n")
+			:writeFourArgs(self.classOrRecordName,".__index = ",self.classOrRecordName,"\n")
+	writeParent(parserParams)
+	return self
+end
+
+method writeParent(parserParams)
+	if self.parentName then
+		parserParams:getDysText():writeFiveArgs("setmetatable(",self.classOrRecordName,",",self.parentName,")\n")
+	end
+	return self
+end
+
+method parseEndClass(parserParams)
+	secondPass(parserParams,self.classOrRecordName)
+	writeEndClass(parserParams)
+	parserParams:update(self.returnMode,1)
+	return self
+end
+
+method writeEndClass(parserParams)
+	writeClassConstructor(parserParams)
+	parserParams:getDysText():writeTwoArgs("return ",self.classOrRecordName)
+	return self
+end
+
+method writeClassConstructor(parserParams)
+	if not self.foundConstructor then
+		writeClassConstructorToDysText(parserParams)
+	end
+	return self
+end
+
+local function writeFinalParamToDysText(dysText,param)
+	dysText:write(param)
+end
+
+method writeClassConstructorToDysText(parserParams)
+	parserParams:getDysText():writeThreeArgs("method new(")
+	writeParamsToDysText(parserParams:getDysText(),self.params,self.writeParamAndCommaToDysText,writeFinalParamToDysText)
+	parserParams:getDysText():write(")\n")
+	writeClassConstructorAndParams(parserParams)
+	return self
+end
+
+method writeClassConstructorAndParams(parserParams)
+	if self.parentName then
+		writeClassConstructWithParent(parserParams)
+	else
+		writeClassConstructNoParent(parserParams)
+	end
+	return self
+end
+
+local function writeChildParamAssignment(dysText,param)
+	dysText:writeFiveArgs("\t__obj__.",param," = ",param,"\n")
+end
+
+method writeClassConstructWithParent(parserParams)
+	parserParams:getDysText():writeThreeArgs("\tlocal __obj__ = setmetatable(",self.parentName,":new(")
+	writeParamsToDysText(parserParams:getDysText(),self.class.parent.params,self.writeParamAndCommaToDysText,writeFinalParamToDysText)
+	parserParams:getDysText():write("),self)\n")
+	writeChildParams(parserParams,writeChildParamAssignment,writeChildParamAssignment)
+	parserParams:getDysText():write("\treturn __obj__\nend\n")
+	return self
+end
+
+method writeChildParams(parserParams,writeFunction,finalWriteFunction)
+	var parentParamDict = self.class.parent and self.class.parent.paramDict or {}
+	var dysText = parserParams:getDysText()
+	if #self.params > 0 then
+		for i=1,#self.params - 1,1 do
+			if not parentParamDict[self.params[i]] then
+				writeFunction(dysText,parserParams:getAt(i))
+			end
+		end
+		if not parentParamDict[self.params[#self.params]] then finalWriteFunction(dysText,self.params[#self.params]) end
+	end
+	return self
+end
+
+local function writeFinalParamAssignmentToDysText(dysText,param)
+	if param then
+		dysText:writeThreeArgs(param," = ",param)
+	end
+end
+
+method writeClassConstructNoParent(parserParams)
+	parserParams:getDysText():write("\treturn setmetatable({")
+	writeParamsToDysText(parserParams:getDysText(),self.params,self.writeAssignmentOfParams,writeFinalParamAssignmentToDysText)
+	parserParams:getDysText():write("},self)\nend\n")
+end
+
+method parseConstructor(parserParams)
+	self.foundConstructor = true
+	var closingParens, constructorParams <const> = grabConstructorParams(parserParams)
+	writeStartOfConstructor(parserParams,constructorParams)
+	var finalI = writeSuperConstructorIfNeed(parserParams,closingParens,constructorParams)
+	parserParams:updateSetI(self,finalI + 1)
+	return self
+end
+
+method grabConstructorParams(parserParams)
+	var openingParens = loopUntilMatch(parserParams,parserParams:getI() + 1,"%(",self.doNothing)
+	var constructorParams = {}
+	var closingParens = loopUntilMatchParams(parserParams,openingParens + 1,"%)",self:returnFunctionAddingTextToParams(constructorParams))
+	return closingParens,constructorParams
+end
+
+method writeStartOfConstructor(parserParams,constructorParams)
+	parserParams:getDysText():writeThreeArgs("method new(")
+	writeParamsToDysText(parserParams:getDysText(),constructorParams,self.writeParamAndCommaToDysText,writeFinalParamToDysText)
+	parserParams:getDysText():writeTwoArgs(")\n","\t\tlocal __obj__ = setmetatable(")
+	return self
+end
+
+method writeSuperConstructorIfNeed(parserParams,closingParens,constructorParams)
+	if self.parentName then
+		var endSuper = writeSuperConstructor(parserParams,closingParens)
+		writeEndOfConstructor(parserParams,constructorParams)
+		return endSuper + 1
+	end
+	parserParams:getDysText():write("{},self)\n")
+	writeEndOfConstructor(parserParams,constructorParams)
+	return closingParens + 1
+end
+
+local function updateCount(token,openingChar,closingChar,count)
+	if token == openingChar then return count + 1 end
+	if token == closingChar then return count - 1 end
+	return count
+end
+
+local function loopThroughUntilClosingChar(start,parserParams,openingChar,closingChar,loopFunc)
+	var index <mutable> = start
+	var limit = parserParams:getLength()
+	var word = {}
+	local count = 1
+	while index <= limit do
+		var token = parserParams:getAt(index)
+		count = updateCount(token,openingChar,closingChar,count)
+		if count <= 0 then break end
+		loopFunc(token,word)
+		index = index + 1
+	end
+	loopFunc(",",word)
+	return index
+end
+
+method writeSuperConstructor(parserParams,closingParens)
+	var superParams = {}
+	var openingParensSuper = loopUntilMatch(parserParams,closingParens + 1,"%(",self.doNothing)
+	var endSuper = loopThroughUntilClosingChar(openingParensSuper + 1,parserParams,"(",")",returnFunctionAddingTextToParams(superParams))
+	parserParams:getDysText():writeTwoArgs(self.parentName,":new(")
+	writeParamsToDysText(parserParams:getDysText(),superParams,self.writeParamAndCommaToDysText,(dys,par) -> dys:writeToArgs(par,"),self\n"))
+	return endSuper
+end
+
+method writeEndOfConstructor(parserParams)
+	parserParams:getDysText():write("\t\t__obj__:__constructor__(")
+	writeChildParams(parserParams,self.writeParamAndCommaToDysText,writeFinalParamToDysText)
+	parserParams:getDysText():writeThreeArgs(")\n\t\treturn __obj__\n\tend\n\nmethod __constructor__(")
+	writeChildParams(parserParams,self.writeParamAndCommaToDysText,writeFinalParamToDysText)
+	parserParams:getDysText():write(")\n")
+	return self
+end
+
+ClassParser.tokenFuncs['endClass'] = ClassParser.parseEndClass
+ClassParser.tokenFuncs['constructor'] = ClassParser.parseConstructor
+
+endClass

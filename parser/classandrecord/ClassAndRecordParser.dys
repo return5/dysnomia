@@ -1,0 +1,87 @@
+var TokenParser = require('parser.TokenParser')
+
+
+class ClassAndRecordParser(returnMode,startI) :> TokenParser
+
+var match = string.match
+var concat = table.concat
+var remove = table.remove
+
+ClassAndRecordParser.tokenFuncs = {}
+
+for token,func in pairs(TokenParser.tokenFuncs) do
+	ClassAndRecordParser.tokenFuncs[token] = func
+end
+
+method writeSelfInFrontOfMethodCall(i,dysText,regex)
+	var prevI = self:loopBackUntilMatch(dysText,i - 1,"%S",self.doNothing)
+	var text = dysText:getAt(prevI)
+	if text ~= "." and text ~= ":" and not match(text,regex) and not match(text,"self:") then
+		dysText:replaceTextAt("self:" .. dysText:getAt(i),i)
+	end
+	return self
+end
+
+method secondPass(parserParams,name)
+	var regex = name .. "[:%.]"
+	var dysText = parserParams:getDysText()
+	for i=self.startI,dysText:getLength(),1 do
+		if self.class.methods[dysText:getAt(i)] then
+			self:writeSelfInFrontOfMethodCall(i,dysText,regex)
+		end
+	end
+	return self
+end
+
+global function ClassAndRecordParser.writeAssignmentOfParams(dysText,param)
+	dysText:writeFourArgs(param," = ",param,",")
+end
+
+global function ClassAndRecordParser.writeParamAndCommaToDysText(dysText,param)
+	dysText:writeTwoArgs(param,",")
+end
+
+method writeParamsToDysText(dysText,params,loopFunc,endingFunc)
+	if #params > 0 then
+		for i=1,#params - 1,1 do
+			loopFunc(dysText,params[i])
+		end
+	end
+	endingFunc(dysText,params[#params])
+	return self
+end
+
+function clearWord(word)
+	for i=1,#word,1 do
+		remove(word)
+	end
+end
+
+method returnFunctionAddingTextToParams(params)
+	return function(text,word)
+		if text and #text > 0 and text ~= "," then
+			word[#word + 1] = text
+		elseif text and #text > 0 and text == "," then
+			params[#params + 1] = concat(word)
+			clearWord(word)
+		end
+	end
+end
+
+method parseMethod(parserParams)
+	var newI = self:loopUntilMatch(parserParams,parserParams:getI() + 1,"%S",self.doNothing)
+	self.class.methods[parserParams:getAt(newI)] = true
+	parserParams:getDysText():writeFourArgs("method ",parserParams:getAt(newI))
+	parserParams:updateSetI(self,newI + 1)
+	return self
+end
+
+ClassAndRecordParser.tokenFuncs['method'] = ClassAndRecordParser.parseMethod
+
+constructor(returnMode,startI)
+    self.returnMode = returnMode
+    self.startI = startI
+    self.params = {}
+end
+
+endClass

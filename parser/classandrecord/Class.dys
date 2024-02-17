@@ -1,0 +1,35 @@
+
+class Class(name,params,parent)
+
+var pairs = pairs
+
+function creatParamDictionary(params)
+	var parentDict = {}
+	if params then
+		for i=1,#params,1 do
+			parentDict[params[i]] = true
+		end
+	end
+	return parentDict
+end
+
+method inherentMethods(parentMethods)
+	for m,_ in pairs(parentMethods) do
+		self.methods[m] = true
+	end
+	return self
+end
+
+constructor(name,params,parent)
+	self.name = name
+    self.params = params
+    self.parent = parent
+    self.foundConstructor = false
+    self.paramDict = creatParamDictionary(params)
+    self.methods = {}
+	if parent then
+		self:inherentMethods(parent.methods)
+	end
+end
+
+endClass
