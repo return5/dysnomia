@@ -11,12 +11,12 @@ method balancedBrackets()
 end
 
 var countersMatches = {
-	["("] = (parser) -> { parser.parensCount +=  1; return parser},
-	[")"] = (parser) -> { parser.parensCount -=  1; return parser},
-	["["] = (parser) -> { parser.bracketCount +=  1; return parser},
-	["]"] = (parser) -> { parser.bracketCount -=  1; return parser},
-	["{"] = (parser) -> { parser.bracesCount +=  1; return parser},
-	["}"] = (parser) -> {  parser.bracesCount -=  1; return parser}
+	["("] = (parser) -> { parser.parensCount += 1},
+	[")"] = (parser) -> { parser.parensCount -= 1},
+	["["] = (parser) -> { parser.bracketCount += 1},
+	["]"] = (parser) -> { parser.bracketCount -= 1},
+	["{"] = (parser) -> { parser.bracesCount += 1},
+	["}"] = (parser) -> {  parser.bracesCount -= 1}
 }
 
 method parseInput(parserParams)
@@ -46,7 +46,7 @@ method setMultiParams(parserParams,startI)
 	loopBackUntilMatch(parserParams,startI,"%(",self:addToParams())
 end
 
-local function eraseDysTextUntil(dysText,charMatchFunc)
+function eraseDysTextUntil(dysText,charMatchFunc)
 	if match(dysText:getCurrent(),"%s") then
 		dysText:loopBackUntil((char) -> match(char,"%S"),dysText.eraseEndingText)
 	end
@@ -90,7 +90,7 @@ method setParams(parserParams)
 	return self
 end
 
-local function iterateParams(params,lambda)
+function iterateParams(params,lambda)
 	for i=#params,1,-1 do
 		lambda[#lambda + 1] = params[i]
 	end

@@ -11,7 +11,7 @@ class VarParser() :> TokenParser
 end
 
 method scrapeVarFlags(newI,parserParams)
-	local finalI <const> = loopUntilMatch(parserParams,newI + 1,"[>=;\n]",self:matchVarFlags())
+	var finalI = loopUntilMatch(parserParams,newI + 1,"[>=;\n]",self:matchVarFlags())
 	if self.flags['global'] then
 		self.flags['local'] = false
 		self.flags['const'] = false
@@ -30,7 +30,7 @@ method getFlags(newI,parserParams)
 end
 
 method addToVarNames(text)
-	local str <const> = self.trimString(text)
+	var str = self.trimString(text)
 	if str and #str > 0 and str ~= "," then
 		self.varNames[#self.varNames + 1] = str
 	end
@@ -70,8 +70,8 @@ end
 
 method parseInput(parserParams)
 	self.varNames = {}
-	local newI <const> = loopUntilMatch(parserParams,parserParams:getI() + 1,"[<=;\n]",(token) -> addToVarNames(token))
-	local finalI <const> = getFlags(newI,parserParams)
+	var newI = loopUntilMatch(parserParams,parserParams:getI() + 1,"[<=;\n]",(token) -> addToVarNames(token))
+	var finalI = getFlags(newI,parserParams)
 	writeVars(parserParams)
 	parserParams:updateSetI(TokenParser,finalI)
 	return self

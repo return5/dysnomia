@@ -1,5 +1,5 @@
 
-class Class(name,params,parent)
+Record Class(name,params,parent)
 
 var pairs = pairs
 
@@ -24,7 +24,6 @@ constructor(name,params,parent)
 	self.name = name
     self.params = params
     self.parent = parent
-    self.foundConstructor = false
     self.paramDict = creatParamDictionary(params)
     self.methods = {}
 	if parent then
@@ -32,4 +31,4 @@ constructor(name,params,parent)
 	end
 end
 
-endClass
+return Class

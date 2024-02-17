@@ -74,7 +74,7 @@ method breakWordThenAddCharToWord(word,char,allWords)
 	return self
 end
 
-local scanTbl <const> = {
+var scanTbl = {
 	[","] = ScanChars.breakWordThenAddCharToAllWords,
 	[")"] = ScanChars.breakWordThenAddCharToAllWords,
 	["("] = ScanChars.breakWordThenAddCharToAllWords,

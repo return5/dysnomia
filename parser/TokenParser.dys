@@ -7,9 +7,9 @@ TokenParser.returnMode = TokenParser
 function TokenParser.doNothing() end
 
 method loopOverString(parserParams,start,endingQuoteMark)
-	local index = start
-	local text <const> = parserParams:getTokens()
-	local prevToken = ""
+	var index <mutable> = start
+	var text = parserParams:getTokens()
+	var prevToken <mutable> = ""
 	while index <= #text do
 		if text[index] == endingQuoteMark and prevToken ~= "\\" then return index end
 		prevToken = text[index]
@@ -19,7 +19,7 @@ method loopOverString(parserParams,start,endingQuoteMark)
 end
 
 method loopBackUntilMatch(text,from,to,doFunc)
-	local index = from
+	var index <mutable> = from
 	while index > 0 and not match(text:getAt(index),to) do
 		doFunc(text:getAt(index),index)
 		index = index - 1
@@ -28,8 +28,8 @@ method loopBackUntilMatch(text,from,to,doFunc)
 end
 
 method loopUntilMatch(parserParams,start,toFind,doFunc)
-	local index = start
-	local stopI <const> = #parserParams:getTokens()
+	var index <mutable> = start
+	var stopI = #parserParams:getTokens()
 	while index <= stopI and not match(parserParams:getAt(index),toFind) do
 		doFunc(parserParams:getAt(index),index)
 		index = index + 1
@@ -38,9 +38,9 @@ method loopUntilMatch(parserParams,start,toFind,doFunc)
 end
 
 method loopUntilMatchParams(parserParams,start,toFind,doFunc)
-	local index = start
-	local stopI <const> = #parserParams:getTokens()
-	local word <const> = {}
+	var index <mutable> = start
+	var stopI = #parserParams:getTokens()
+	var word = {}
 	while index <= stopI and not match(parserParams:getAt(index),toFind) do
 		doFunc(parserParams:getAt(index),word)
 		index = index + 1

@@ -1,10 +1,10 @@
-local TokenParser <const> = require('parser.TokenParser')
+var TokenParser = require('parser.TokenParser')
 
 class LocalParser()
 
 method parseInput(parserParams)
 	parserParams:getDysText():write('local ')
-	local nextI <const> = loopUntilMatch(parserParams,parserParams:getI() + 1, "%S",self.doNothing)
+	var nextI = loopUntilMatch(parserParams,parserParams:getI() + 1, "%S",self.doNothing)
 	if parserParams:isTokenMatch(nextI,"function") then
 		parserParams:getDysText():write("function")
 		parserParams:updateSetI(TokenParser,nextI + 1)

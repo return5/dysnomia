@@ -1,4 +1,4 @@
-local TokenParser <const> = require('parser.TokenParser')
+var TokenParser = require('parser.TokenParser')
 
 
 class RequireOnlyParser() :> TokenParser

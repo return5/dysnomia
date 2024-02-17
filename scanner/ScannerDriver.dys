@@ -31,7 +31,7 @@ class ScannerDriver()
         return scanMinusSignClass:firstInput(word,char,allWords)
     end
 
-    local function postConstruct()
+    function postConstruct()
         ScanChars:initScannerDriver(ScannerDriver)
     end
 

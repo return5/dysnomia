@@ -8,7 +8,7 @@ function MultiStatementLambda:finishLambda(parserParams)
 	return self
 end
 
-local endingChars <const> = {
+var endingChars = {
 	["}"] = true,
 }
 

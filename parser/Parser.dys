@@ -13,13 +13,13 @@ require('parser.ParserDriver')
 class Parser(text,filePath)
 
 method parseFile(tokenParser)
-	local parserParameters <const> = ParserParameters:new(tokenParser,1,self.text,DysText:new())
-	local index = 1
+	var parserParameters = ParserParameters:new(tokenParser,1,self.text,DysText:new())
+	var index <mutable> = 1
 	while index <= #self.text do
 		parserParameters.currentMode:parseInput(parserParameters)
 		index = parserParameters:getI()
 	end
-	local fileWriter <const> = FileWriter(FileAttr(self.filePath,parserParameters:getDysText():getDysText()))
+	var fileWriter = FileWriter(FileAttr(self.filePath,parserParameters:getDysText():getDysText()))
 	fileWriter:writeFile()
 	return self
 end
@@ -39,7 +39,7 @@ constructor(text,filePath)
     inClass = false
 end
 
-local function postConstruct()
+function postConstruct()
 	RequireParser.Parser = Parser
 end
 

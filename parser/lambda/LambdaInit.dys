@@ -5,13 +5,13 @@ var MultiStatementLambda = require('parser.lambda.MultiStatementLambda')
 class LambdaInit() :> TokenParser
 
 method singleStatementLambda(returnMode,parserParams,bodyStartI)
-	local singleStatementLambda <const> = SingleStatementLambda:new(returnMode)
+	var singleStatementLambda = SingleStatementLambda:new(returnMode)
 	singleStatementLambda:startParsing(parserParams,bodyStartI)
 	return self
 end
 
 method multiStatementLambda(returnMode,parserParams,bodyStartI)
-	local multiStatementLambda <const> = MultiStatementLambda:new(returnMode)
+	var multiStatementLambda = MultiStatementLambda:new(returnMode)
 	multiStatementLambda:startParsing(parserParams,bodyStartI)
 	return self
 end
@@ -21,7 +21,7 @@ method getBodyStartI(parserParams)
 end
 
 method startParsing(returnMode,parserParams)
-	local bodyStartI <const> = getBodyStartI(parserParams)
+	var bodyStartI = getBodyStartI(parserParams)
 	if parserParams:getAt(bodyStartI) ~= "{" then return singleStatementLambda(returnMode,parserParams) end
 	return multiStatementLambda(returnMode,parserParams,bodyStartI)
 end

@@ -7,14 +7,14 @@ var gsub = string.gsub
 class RequireParser() :> TokenParser
 
 method parseParenthesisStatement(parserParams)
-	local fileNameI <const> = loopUntilMatch(parserParams,parserParams:getI() + 1,"['\"]",self.doNothing)
-	local closingParen <const> = loopUntilMatch(parserParams,fileNameI + 1,"%)",self.doNothing)
-	local fileName <const> = gsub(parserParams:getAt(fileNameI),"['\"]","")
+	var fileNameI = loopUntilMatch(parserParams,parserParams:getI() + 1,"['\"]",self.doNothing)
+	var closingParen = loopUntilMatch(parserParams,fileNameI + 1,"%)",self.doNothing)
+	var fileName = gsub(parserParams:getAt(fileNameI),"['\"]","")
 	return closingParen,fileName
 end
 
 method writeFileName(start,stop,parserParams)
-	local dysTest <const> = parserParams:getDysText()
+	var dysTest = parserParams:getDysText()
 	for i=start,stop,1 do
 		dysTest:write(parserParams:getAt(i))
 	end
@@ -23,9 +23,9 @@ end
 
 method scanAndParseRequiredFile(fileAttr)
 	if fileAttr then
-		local scanner <const> = Scanner:new(fileAttr)
-		local scanned <const> = scanner:scanFile()
-		local parser <const> = RequireParser.Parser:new(scanned,fileAttr.filePath)
+		var scanner = Scanner:new(fileAttr)
+		var scanned = scanner:scanFile()
+		var parser = RequireParser.Parser:new(scanned,fileAttr.filePath)
 		if fileAttr.isLuaFile then
 			parser:parseLuaFile()
 		else
@@ -36,9 +36,9 @@ method scanAndParseRequiredFile(fileAttr)
 end
 
 method parseRequire(parserParams)
-	local closingParen <const>, fileName <const> = parseParenthesisStatement(parserParams)
+	var closingParen, fileName <const> = parseParenthesisStatement(parserParams)
 	writeFileName(parserParams:getI(),closingParen,parserParams)
-	local fileAttr <const> = FileReader:new(fileName):readFile()
+	var fileAttr = FileReader:new(fileName):readFile()
 	if fileAttr.fileName and not FileSkipper:scanForSkipFile(fileAttr)  then
 		scanAndParseRequiredFile(fileAttr)
 	end
@@ -47,8 +47,8 @@ method parseRequire(parserParams)
 end
 
 method parseInput(parserParams)
-	local prevNewLine <const> = loopBackUntilMatch(parserParams,parserParams:getI() - 1,"\n",self.doNothing)
-	local prevNonSpace <const> = loopBackUntilMatch(parserParams,prevNewLine - 1,"%S",self.doNothing)
+	var prevNewLine = loopBackUntilMatch(parserParams,parserParams:getI() - 1,"\n",self.doNothing)
+	var prevNonSpace = loopBackUntilMatch(parserParams,prevNewLine - 1,"%S",self.doNothing)
 	if prevNewLine > 0 and prevNonSpace > 0 and parserParams:isTokenMatchExpression(prevNonSpace,"#skipRequire") then
 		parserParams:update(TokenParser,1)
 		return self

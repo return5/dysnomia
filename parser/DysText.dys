@@ -9,7 +9,7 @@ method eraseEndingText()
 end
 
 method loopBackUntil(matchFunc,func)
-	local i = #self.text
+	var i <mutable> = #self.text
 	while i > 0 and not matchFunc(self.text[i]) do
 		func(self)
 		i = i - 1

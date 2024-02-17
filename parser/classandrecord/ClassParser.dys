@@ -88,7 +88,7 @@ method writeClassConstructor(parserParams)
 	return self
 end
 
-local function writeFinalParamToDysText(dysText,param)
+function writeFinalParamToDysText(dysText,param)
 	dysText:write(param)
 end
 
@@ -109,7 +109,7 @@ method writeClassConstructorAndParams(parserParams)
 	return self
 end
 
-local function writeChildParamAssignment(dysText,param)
+function writeChildParamAssignment(dysText,param)
 	dysText:writeFiveArgs("\t__obj__.",param," = ",param,"\n")
 end
 
@@ -136,7 +136,7 @@ method writeChildParams(parserParams,writeFunction,finalWriteFunction)
 	return self
 end
 
-local function writeFinalParamAssignmentToDysText(dysText,param)
+function writeFinalParamAssignmentToDysText(dysText,param)
 	if param then
 		dysText:writeThreeArgs(param," = ",param)
 	end
@@ -182,13 +182,13 @@ method writeSuperConstructorIfNeed(parserParams,closingParens,constructorParams)
 	return closingParens + 1
 end
 
-local function updateCount(token,openingChar,closingChar,count)
+function updateCount(token,openingChar,closingChar,count)
 	if token == openingChar then return count + 1 end
 	if token == closingChar then return count - 1 end
 	return count
 end
 
-local function loopThroughUntilClosingChar(start,parserParams,openingChar,closingChar,loopFunc)
+function loopThroughUntilClosingChar(start,parserParams,openingChar,closingChar,loopFunc)
 	var index <mutable> = start
 	var limit = parserParams:getLength()
 	var word = {}

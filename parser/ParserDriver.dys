@@ -64,7 +64,7 @@ method parseLambda(parserParams,returnMode)
 	return LambdaInit:startParsing(returnMode,parserParams)
 end
 
-local function postConstruct()
+function postConstruct()
 	TokenParser.parserDriver = ParserDriver
 end
 

@@ -22,11 +22,12 @@ method parseParams(index,parserParams)
 	var closeParens = loopUntilMatchParams(parserParams,openParens + 1,"%)",self:returnFunctionAddingTextToParams(self.params))
 	return closeParens
 end
-local function writeFinalAssigmentOfParams(dysText,param)
+
+function writeFinalAssigmentOfParams(dysText,param)
 	dysText:writeFourArgs(param," = ",param,"}\n")
 end
 
-local function writeFinalRecordParam(dysText,param)
+function writeFinalRecordParam(dysText,param)
 	dysText:writeTwoArgs(param,")\n")
 end
 
