@@ -1,0 +1,24 @@
+var TokenParser = require('parser.TokenParser')
+var RecordParser = require('parser.classandrecord.RecordParser')
+
+class GlobalParser() :> TokenParser
+
+method parseInput(parserParams)
+	local nextI <const> = loopUntilMatch(parserParams,parserParams:getI() + 1,"%S",self.doNothing)
+	if parserParams:isTokenMatch(nextI,"function") then
+		parserParams:getDysText():write('function')
+		parserParams:updateSetI(parserParams.currentMode,nextI + 1)
+
+	elseif parserParams:isTokenMatch(nextI,"record") then
+		parserParams:setI(nextI)
+		RecordParser:new(parserParams.currentMode,parserParams:getDysText():getLength()):startParsingRecord(parserParams)
+		return self
+	else
+		parserParams:getDysText():write("global ")
+		parserParams:updateSetI(parserParams.currentMode,nextI)
+	end
+	return self
+end
+
+
+endClass

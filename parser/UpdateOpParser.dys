@@ -1,0 +1,13 @@
+var TokenParser = require('parser.TokenParser')
+var setmetatable = setmetatable
+
+class UpdateOpParser(op) :> TokenParser
+
+method parseUpdateOp(parserParams)
+	local varI <const> = loopBackUntilMatch(parserParams,parserParams:getI() - 1,"%S+",self.doNothing)
+	parserParams:getDysText():writeThreeArgs("= ",parserParams:getAt(varI),self.op)
+	parserParams:update(TokenParser,1)
+	return self
+end
+
+endClass

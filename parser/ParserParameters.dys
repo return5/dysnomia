@@ -1,0 +1,73 @@
+var setmetatable = setmetatable
+var match = string.match
+
+class ParserParameters(currentMode,i,tokens,dysText)
+
+method isIWithinLen()
+	return self.i <= #self.tokens
+end
+
+method isTokenMatchExpression(index,expression)
+	return match(self.tokens[index],expression)
+end
+
+method isTokenMatch(index,toMatch)
+	return self.tokens[index] == toMatch
+end
+
+method isCurrentToken(toMatch)
+	return isTokenMatch(self.i,toMatch)
+end
+
+method isPrevToken(toMatch)
+	return isTokenMatch(self.i - 1,toMatch)
+end
+
+method getCurrentToken()
+	return self.tokens[self.i]
+end
+
+method getAt(index)
+	return self.tokens[index]
+end
+
+method updateSetI(currentMode,newI)
+	self.i = newI
+	self.currentMode = currentMode
+	return self
+end
+
+method getI()
+	return self.i
+end
+
+method setI(newI)
+	self.i = newI
+	return self
+end
+
+method getTokens()
+	return self.tokens
+end
+
+method update(currentMode,incr)
+	self.i += incr
+	self.currentMode = currentMode
+	return self
+end
+
+method getDysText()
+	return self.dysText
+end
+
+method setCurrentMode(currentMode)
+	self.currentMode = currentMode
+	return self
+end
+
+method getLength()
+	return #self.tokens
+end
+
+
+endClass

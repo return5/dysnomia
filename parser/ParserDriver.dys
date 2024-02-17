@@ -1,0 +1,73 @@
+var UpdateOpParser = require('parser.UpdateOpParser')
+var VarParser = require('parser.VarParser')
+var GlobalParser = require('parser.GlobalParser')
+var FunctionParser = require('parser.FunctionParser')
+var LocalParser = require('parser.LocalParser')
+var RequireParser = require('parser.RequireParser')
+var TokenParser = require('parser.TokenParser')
+var RecordParser = require('parser.classandrecord.RecordParser')
+var ClassParser = require('parser.classandrecord.ClassParser')
+var LambdaInit = require('parser.lambda.LambdaInit')
+
+class ParserDriver()
+
+var addUpOp = UpdateOpParser:new(" +")
+var subUpOp = UpdateOpParser:new(" -")
+var multUpOp = UpdateOpParser:new(" *")
+var divUpOp = UpdateOpParser:new(" /")
+
+method parseAddOp(parserParams)
+	return addUpOp:parseUpdateOp(parserParams)
+end
+
+method parseSubOp(parserParams)
+	return subUpOp:parseUpdateOp(parserParams)
+end
+
+method parseDivOp(parserParams)
+	return divUpOp:parseUpdateOp(parserParams)
+end
+
+method parseMultOp(parserParams)
+	return multUpOp:parseUpdateOp(parserParams)
+end
+
+method parseVar(parserParams)
+	return VarParser:parseInput(parserParams)
+end
+
+method parseGlobal(parserParams)
+	return GlobalParser:parseInput(parserParams)
+end
+
+method parseFunction(parserParams)
+	return FunctionParser:parseInput(parserParams)
+end
+
+method parseLocal(parserParams)
+	return LocalParser:parseInput(parserParams)
+end
+
+method parseRequire(parserParams)
+	return RequireParser:parseInput(parserParams)
+end
+
+method parseRecord(parserParams,returnMode)
+	return RecordParser:new(returnMode,parserParams:getDysText():getLength()):startParsingLocalRecord(parserParams)
+end
+
+method parseClass(parserParams,returnMode)
+	return ClassParser:new(returnMode,parserParams:getDysText():getLength()):startParsingClass(parserParams)
+end
+
+method parseLambda(parserParams,returnMode)
+	return LambdaInit:startParsing(returnMode,parserParams)
+end
+
+local function postConstruct()
+	TokenParser.parserDriver = ParserDriver
+end
+
+postConstruct()
+
+endClass

@@ -1,0 +1,71 @@
+var setmetatable = setmetatable
+var remove = table.remove
+
+
+class DysText()
+
+method eraseEndingText()
+	remove(self.text)
+end
+
+method loopBackUntil(matchFunc,func)
+	local i = #self.text
+	while i > 0 and not matchFunc(self.text[i]) do
+		func(self)
+		i = i - 1
+	end
+	return self
+end
+
+method write(arg)
+	self.text[#self.text + 1] = arg
+	return self
+end
+
+method writeTwoArgs(arg1,arg2)
+	write(arg1):write(arg2)
+	return self
+end
+
+method writeThreeArgs(arg1,arg2,arg3)
+	writeTwoArgs(arg1,arg2):write(arg3)
+	return self
+end
+
+method writeFourArgs(arg1,arg2,arg3,arg4)
+	writeThreeArgs(arg1,arg2,arg3):write(arg4)
+	return self
+end
+
+method writeFiveArgs(arg1,arg2,arg3,arg4,arg5)
+	writeFourArgs(arg1,arg2,arg3,arg4):write(arg5)
+	return self
+end
+
+method getDysText()
+	return self.text
+end
+
+method getLength()
+	return #self.text
+end
+
+method getAt(index)
+	return self.text[index]
+end
+
+method getCurrent()
+	return self.text[#self.text]
+end
+
+method replaceTextAt(text,index)
+	self.text[index] = text
+	return self
+end
+
+constructor()
+    self.text = {}
+end
+
+
+endClass

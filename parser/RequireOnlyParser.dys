@@ -1,0 +1,10 @@
+local TokenParser <const> = require('parser.TokenParser')
+
+
+class RequireOnlyParser() :> TokenParser
+
+RequireOnlyParser.tokenFuncs = {
+	['require'] = TokenParser.parseRequire
+}
+
+return RequireOnlyParser

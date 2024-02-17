@@ -1,0 +1,35 @@
+var LambdaParser = require('parser.lambda.LambdaParser')
+
+
+class SingleStatementLambda(returnMode) :> LambdaParser
+
+method finishLambda(parserParams)
+	parserParams:getDysText():write(" end ")
+	parserParams:update(self.returnMode,0)
+	return self
+end
+
+var endingChars = {
+	[";"] = true,
+	[","] = true,
+	["\n"] = true,
+	["\r"] = true,
+	["end"] = true,
+	[")"] = true,
+	["]"] = true,
+	["}"] = true
+}
+
+method endingFunc(char)
+	return endingChars[char]
+end
+
+method startParsing(parserParams)
+	LambdaParser.startParsing(self,parserParams)
+	parserParams:getDysText():write("return ")
+	parserParams:update(self,1)
+	return self
+end
+
+return SingleStatementLambda
+

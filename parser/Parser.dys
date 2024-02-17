@@ -1,0 +1,48 @@
+var FileWriter = require('fileOperations.FileWriter')
+var FileAttr = require('fileOperations.FileAttr')
+var ParserParameters = require('parser.ParserParameters')
+var TokenParser = require('parser.TokenParser')
+var DysText = require('parser.DysText')
+var RequireParser = require('parser.RequireParser')
+var RequireOnlyParser = require('parser.RequireOnlyParser')
+
+
+require('parser.ParserDriver')
+
+
+class Parser(text,filePath)
+
+method parseFile(tokenParser)
+	local parserParameters <const> = ParserParameters:new(tokenParser,1,self.text,DysText:new())
+	local index = 1
+	while index <= #self.text do
+		parserParameters.currentMode:parseInput(parserParameters)
+		index = parserParameters:getI()
+	end
+	local fileWriter <const> = FileWriter(FileAttr(self.filePath,parserParameters:getDysText():getDysText()))
+	fileWriter:writeFile()
+	return self
+end
+
+method beginParsing()
+	return parseFile(TokenParser)
+end
+
+method parseLuaFile()
+	return parseFile(RequireOnlyParser)
+end
+
+constructor(text,filePath)
+    self.filePath = filePath
+    self.text = text
+    self.methods = {}
+    inClass = false
+end
+
+local function postConstruct()
+	RequireParser.Parser = Parser
+end
+
+postConstruct()
+
+endClass

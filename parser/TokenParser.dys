@@ -1,0 +1,83 @@
+var match = string.match
+
+class TokenParser()
+
+TokenParser.returnMode = TokenParser
+
+function TokenParser.doNothing() end
+
+method loopOverString(parserParams,start,endingQuoteMark)
+	local index = start
+	local text <const> = parserParams:getTokens()
+	local prevToken = ""
+	while index <= #text do
+		if text[index] == endingQuoteMark and prevToken ~= "\\" then return index end
+		prevToken = text[index]
+		index = index + 1
+	end
+	return -1
+end
+
+method loopBackUntilMatch(text,from,to,doFunc)
+	local index = from
+	while index > 0 and not match(text:getAt(index),to) do
+		doFunc(text:getAt(index),index)
+		index = index - 1
+	end
+	return index
+end
+
+method loopUntilMatch(parserParams,start,toFind,doFunc)
+	local index = start
+	local stopI <const> = #parserParams:getTokens()
+	while index <= stopI and not match(parserParams:getAt(index),toFind) do
+		doFunc(parserParams:getAt(index),index)
+		index = index + 1
+	end
+	return index
+end
+
+method loopUntilMatchParams(parserParams,start,toFind,doFunc)
+	local index = start
+	local stopI <const> = #parserParams:getTokens()
+	local word <const> = {}
+	while index <= stopI and not match(parserParams:getAt(index),toFind) do
+		doFunc(parserParams:getAt(index),word)
+		index = index + 1
+	end
+	if index ~= start then
+		doFunc(",",word)
+	end
+	return index
+end
+
+function TokenParser.trimString(str)
+	return match(str,"^%s*(.-)%s*$")
+end
+
+TokenParser.tokenFuncs = {
+	['var'] = (tokenParser,parserParams) -> tokenParser.parserDriver:parseVar(parserParams),
+	['global'] = (tokenParser,parserParams) -> tokenParser.parserDriver:parseGlobal(parserParams),
+	["+="] = (tokenParser,parserParams) -> tokenParser.parserDriver:parseAddOp(parserParams),
+	["-="] = (tokenParser,parserParams) -> tokenParser.parserDriver:parseSubOp(parserParams),
+	["/="] = (tokenParser,parserParams) -> tokenParser.parserDriver:parseDivOp(parserParams),
+	["*="] = (tokenParser,parserParams) -> tokenParser.parserDriver:parseMultOp(parserParams),
+	['function'] = (tokenParser,parserParams) -> tokenParser.parserDriver:parseFunction(parserParams),
+	['local'] = (tokenParser,parserParams) -> tokenParser.parserDriver:parseLocal(parserParams),
+	['require'] = (tokenParser,parserParams) -> tokenParser.parserDriver:parseRequire(parserParams),
+	['endRec'] = (tokenParser,parserParams) -> { parserParams:update(tokenParser.returnMode,1); return tokenParser },
+	['record'] = (tokenParser,parserParams) -> TokenParser.parserDriver:parseRecord(parserParams,tokenParser),
+	['class'] = (tokenParser,parserParams) -> TokenParser.parserDriver:parseClass(parserParams,tokenParser),
+	["->"] = (tokenParser,parserParams) -> TokenParser.parserDriver:parseLambda(parserParams,tokenParser)
+}
+
+method parseInput(parserParams)
+	if self.tokenFuncs[parserParams:getCurrentToken()] then
+		return self.tokenFuncs[parserParams:getCurrentToken()](self,parserParams)
+	end
+	parserParams:getDysText():write(parserParams:getCurrentToken())
+	parserParams:update(self,1)
+	return self
+end
+
+endClass

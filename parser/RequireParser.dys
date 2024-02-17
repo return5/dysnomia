@@ -1,0 +1,60 @@
+var TokenParser = require('parser.TokenParser')
+var Scanner = require('scanner.Scanner')
+var FileReader = require('fileOperations.FileReader')
+var FileSkipper = require('fileOperations.FileSkipper')
+var gsub = string.gsub
+
+class RequireParser() :> TokenParser
+
+method parseParenthesisStatement(parserParams)
+	local fileNameI <const> = loopUntilMatch(parserParams,parserParams:getI() + 1,"['\"]",self.doNothing)
+	local closingParen <const> = loopUntilMatch(parserParams,fileNameI + 1,"%)",self.doNothing)
+	local fileName <const> = gsub(parserParams:getAt(fileNameI),"['\"]","")
+	return closingParen,fileName
+end
+
+method writeFileName(start,stop,parserParams)
+	local dysTest <const> = parserParams:getDysText()
+	for i=start,stop,1 do
+		dysTest:write(parserParams:getAt(i))
+	end
+	return self
+end
+
+method scanAndParseRequiredFile(fileAttr)
+	if fileAttr then
+		local scanner <const> = Scanner:new(fileAttr)
+		local scanned <const> = scanner:scanFile()
+		local parser <const> = RequireParser.Parser:new(scanned,fileAttr.filePath)
+		if fileAttr.isLuaFile then
+			parser:parseLuaFile()
+		else
+			parser:beginParsing()
+		end
+	end
+	return self
+end
+
+method parseRequire(parserParams)
+	local closingParen <const>, fileName <const> = parseParenthesisStatement(parserParams)
+	writeFileName(parserParams:getI(),closingParen,parserParams)
+	local fileAttr <const> = FileReader:new(fileName):readFile()
+	if fileAttr.fileName and not FileSkipper:scanForSkipFile(fileAttr)  then
+		scanAndParseRequiredFile(fileAttr)
+	end
+	parserParams:updateSetI(TokenParser,closingParen + 1)
+	return self
+end
+
+method parseInput(parserParams)
+	local prevNewLine <const> = loopBackUntilMatch(parserParams,parserParams:getI() - 1,"\n",self.doNothing)
+	local prevNonSpace <const> = loopBackUntilMatch(parserParams,prevNewLine - 1,"%S",self.doNothing)
+	if prevNewLine > 0 and prevNonSpace > 0 and parserParams:isTokenMatchExpression(prevNonSpace,"#skipRequire") then
+		parserParams:update(TokenParser,1)
+		return self
+	end
+	parseRequire(parserParams)
+	return self
+end
+
+endClass

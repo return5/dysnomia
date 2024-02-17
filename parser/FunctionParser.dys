@@ -1,0 +1,17 @@
+var TokenParser = require(parser.TokenParser')
+
+class FunctionParser() :> TokenParser
+
+method parseInput(parseParameters)
+	local newI <const> = loopBackUntilMatch(parseParameters,parseParameters:getI() - 1, "%S+",self.doNothing)
+	if  self.trimString(parseParameters:getAt(newI)) == "=" then
+		parseParameters:getDysText():write('function')
+	else
+		parseParameters:getDysText():write('local function')
+	end
+	parseParameters:update(TokenParser,1)
+	return self
+end
+
+
+endClass

@@ -1,0 +1,80 @@
+var TokenParser = require('dysnomiaParser.TokenParser')
+
+class VarParser() :> TokenParser
+
+ method matchVarFlags()
+	return function(text)
+		if text and #text > 0 and text ~= "," then
+			self.flags[text] = true
+		end
+	end
+end
+
+method scrapeVarFlags(newI,parserParams)
+	local finalI <const> = loopUntilMatch(parserParams,newI + 1,"[>=;\n]",self:matchVarFlags())
+	if self.flags['global'] then
+		self.flags['local'] = false
+		self.flags['const'] = false
+	elseif self.flags['mutable'] then
+		self.flags['const'] = false
+	end
+	return finalI + 1
+end
+
+method getFlags(newI,parserParams)
+	self.flags = {['local'] = true, ['const'] = true}
+	if parserParams:isTokenMatch(newI,"<") then
+		return scrapeVarFlags(newI,parserParams)
+	end
+	return newI
+end
+
+method addToVarNames(text)
+	local str <const> = self.trimString(text)
+	if str and #str > 0 and str ~= "," then
+		self.varNames[#self.varNames + 1] = str
+	end
+	return self
+end
+
+method writeLocal(parserParams)
+	if self.flags['local'] then
+		parserParams:getDysText():write('local ')
+	end
+end
+
+method writeVarNames(parserParams)
+	if #self.varNames > 0 then
+		for i=1,#self.varNames - 1,1 do
+			writeVar(i,parserParams)
+			parserParams:getDysText():write(',')
+		end
+		writeVar(#self.varNames,parserParams)
+	end
+	return self
+end
+
+method writeVars(parserParams)
+	writeLocal(parserParams)
+	writeVarNames(parserParams)
+	return self
+end
+
+method writeVar(i,parserParams)
+	parserParams:getDysText():write(self.varNames[i])
+	if self.flags['const'] then
+		parserParams:getDysText():write(" <const> ")
+	end
+	return self
+end
+
+method parseInput(parserParams)
+	self.varNames = {}
+	local newI <const> = loopUntilMatch(parserParams,parserParams:getI() + 1,"[<=;\n]",(token) -> addToVarNames(token))
+	local finalI <const> = getFlags(newI,parserParams)
+	writeVars(parserParams)
+	parserParams:updateSetI(TokenParser,finalI)
+	return self
+end
+
+endClass
