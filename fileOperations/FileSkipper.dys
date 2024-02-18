@@ -1,0 +1,16 @@
+var ConfigManager = require('config.ConfigManager')
+
+class FileSkipper()
+
+var match = string.match
+
+method scanForSkipFile(fileAttr)
+	var isSkippedFile = match(fileAttr.text,"\n*%s*%-%-.+#[Ss]kip[fF]ile")
+	if isSkippedFile then
+		ConfigManager:addToSkipFiles(fileAttr.filePath)
+		return true
+	end
+	return false
+end
+
+endClass

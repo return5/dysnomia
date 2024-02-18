@@ -1,0 +1,5 @@
+
+
+Record FileAttr(filePath,text,fileName,isLuaFile) endRec
+
+return FileAttr
