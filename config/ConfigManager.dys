@@ -1,0 +1,40 @@
+var Config = require('config.config')
+
+
+class ConfigManager()
+
+var toLower = string.lower
+
+method addToSkipFiles(file)
+	if not Config.skip then Config.skip = {} end
+	Config.skip[#Config.skip + 1] = file
+	return self
+end
+
+method setOs(os)
+	Config.os = toLower(os)
+	return self
+end
+
+method setNewLine(newLine)
+	Config.newLine = newLine
+	return self
+end
+
+method setSep(sep)
+	Config.sep = sep
+	return self
+end
+
+method setRun(run)
+	Config.run = run
+	return self
+end
+
+method setTemp(temp)
+	Config.temp = temp
+	return self
+end
+
+
+endClass
