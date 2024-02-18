@@ -1,0 +1,74 @@
+--[[
+	dysnomia: a programing language running on top of lua 5.4 . extends syntax and features of lua 5.4
+    Copyright (C) <2023>  <return5>
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+--]]
+
+
+var Config = require('config.config')
+var FileReader = require('fileOperations.FileReader')
+var FileWriter = require('fileOperations.FileWriter')
+var Parser = require('parser.Parser')
+var Scanner = require('scanner.Scanner')
+var FileSkipper = require('fileOperations.FileSkipper')
+var ArgHandler = require('args.ArgHandler')
+
+
+function runParser()
+	var fileReader = FileReader:new(FileReader.checkMainFile(arg[#arg]))
+	var file = fileReader:readFile()
+	var isSkipped = FileSkipper:scanForSkipFile(file)
+	if file and not isSkipped then
+		var scanned = Scanner:new(file):scanFile()
+		var parser = Parser:new(scanned,file.filePath)
+		if file.isLuaFile then
+			parser:parseLuaFile()
+		else
+			parser:beginParsing()
+		end
+		if Config.run then
+			var file = arg[#arg]:gsub("%.dys$",".lua")
+			os.execute("lua " .. file)
+		end
+		if Config.temp then
+			FileWriter.removeFiles()
+		end
+	end
+end
+
+function setPath()
+	var pipe = io.popen('echo "$PWD"')
+	var dir =  pipe:read()
+	pipe:close()
+	package.path =  dir .. "/?.lua;" .. dir .. "/?.dys" ..  package.path
+end
+
+function main()
+	setPath()
+	if #arg == 0 then
+		ArgHandler.printHelp()
+		os.exit(75)
+	end
+	var preChecks = {}
+	if #arg > 0 then
+		ArgHandler.parseOptions(arg,preChecks)
+	end
+	for i=1,#preChecks,1 do
+		preChecks[i]()
+	end
+	runParser()
+end
+
+main()
