@@ -1,0 +1,4 @@
+
+Record ArgOptions(flag,pat,descr,fun) endRec
+
+return ArgOptions
