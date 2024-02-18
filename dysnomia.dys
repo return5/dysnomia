@@ -50,7 +50,7 @@ end
 
 function setPath()
 	var pipe = io.popen('echo "$PWD"')
-	var dir =  pipe:read()
+	var dir = pipe:read()
 	pipe:close()
 	package.path =  dir .. "/?.lua;" .. dir .. "/?.dys" ..  package.path
 end
