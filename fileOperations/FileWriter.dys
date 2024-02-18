@@ -1,4 +1,4 @@
-var Config = require('dysnomiaConfig.config')
+var Config = require('config.config')
 
 class FileWriter(file)
 
