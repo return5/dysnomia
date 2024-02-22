@@ -1,5 +1,5 @@
 
 
-Record FileAttr(filePath,text,fileName,isLuaFile) endRec
+record FileAttr(filePath,text,fileName,isLuaFile) endRec
 
 return FileAttr

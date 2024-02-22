@@ -4,7 +4,7 @@ class TokenParser()
 
 TokenParser.returnMode = TokenParser
 
-function TokenParser.doNothing() end
+global function TokenParser.doNothing() end
 
 method loopOverString(parserParams,start,endingQuoteMark)
 	var index <mutable> = start
@@ -51,7 +51,7 @@ method loopUntilMatchParams(parserParams,start,toFind,doFunc)
 	return index
 end
 
-function TokenParser.trimString(str)
+global function TokenParser.trimString(str)
 	return match(str,"^%s*(.-)%s*$")
 end
 
@@ -66,9 +66,9 @@ TokenParser.tokenFuncs = {
 	['local'] = (tokenParser,parserParams) -> tokenParser.parserDriver:parseLocal(parserParams),
 	['require'] = (tokenParser,parserParams) -> tokenParser.parserDriver:parseRequire(parserParams),
 	['endRec'] = (tokenParser,parserParams) -> { parserParams:update(tokenParser.returnMode,1); return tokenParser },
-	['record'] = (tokenParser,parserParams) -> TokenParser.parserDriver:parseRecord(parserParams,tokenParser),
-	['class'] = (tokenParser,parserParams) -> TokenParser.parserDriver:parseClass(parserParams,tokenParser),
-	["->"] = (tokenParser,parserParams) -> TokenParser.parserDriver:parseLambda(parserParams,tokenParser)
+	['record'] = (tokenParser,parserParams) -> tokenParser.parserDriver:parseRecord(parserParams,tokenParser),
+	['class'] = (tokenParser,parserParams) -> tokenParser.parserDriver:parseClass(parserParams,tokenParser),
+	["->"] = (tokenParser,parserParams) -> tokenParser.parserDriver:parseLambda(parserParams,tokenParser)
 }
 
 method parseInput(parserParams)

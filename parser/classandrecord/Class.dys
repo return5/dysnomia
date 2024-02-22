@@ -1,5 +1,5 @@
 
-Record Class(name,params,parent)
+class Class(name,params,parent)
 
 var pairs = pairs
 
@@ -31,4 +31,4 @@ constructor(name,params,parent)
 	end
 end
 
-return Class
+endClass

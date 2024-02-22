@@ -1,7 +1,12 @@
 var ClassAndRecordParser = require('parser.classandrecord.ClassAndRecordParser')
 var Class = require('parser.classandrecord.Class')
 
-class RecordParser() :> ClassAndRecordParser
+class RecordParser(returnMode,startI) :> ClassAndRecordParser
+
+RecordParser.tokenFuncs = {}
+for token,func in pairs(ClassAndRecordParser.tokenFuncs) do
+	RecordParser.tokenFuncs[token] = func
+end
 
 method writeEndRecord(parserParams)
 	parserParams:getDysText():writeFiveArgs("\treturn setmetatable({},{__index = ",self.classOrRecordName,

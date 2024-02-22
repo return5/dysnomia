@@ -3,7 +3,7 @@ var Config = require('config.config')
 
 class ArgHandler()
 
-Record ArgOptions(flag,pat,descr,fun) endRec
+record ArgOptions(flag,pat,descr,fun) endRec
 
 var write = io.write
 var pcall = pcall

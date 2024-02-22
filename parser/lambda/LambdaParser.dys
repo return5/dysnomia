@@ -37,9 +37,7 @@ end
 
 method addToParams()
 	self.params = {}
-	return function(param)
-		self.params[#self.params + 1] = param
-	end
+	return (param) -> {	self.params[#self.params + 1] = param }
 end
 
 method setMultiParams(parserParams,startI)

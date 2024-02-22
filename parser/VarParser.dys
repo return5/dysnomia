@@ -1,13 +1,13 @@
-var TokenParser = require('dysnomiaParser.TokenParser')
+var TokenParser = require('parser.TokenParser')
 
 class VarParser() :> TokenParser
 
  method matchVarFlags()
-	return function(text)
+	return (text) -> {
 		if text and #text > 0 and text ~= "," then
 			self.flags[text] = true
 		end
-	end
+	}
 end
 
 method scrapeVarFlags(newI,parserParams)

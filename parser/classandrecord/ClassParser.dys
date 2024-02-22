@@ -5,6 +5,12 @@ class ClassParser(returnMode,startI) :> ClassAndRecordParser
 
 ClassParser.classes = {}
 
+ClassParser.tokenFuncs = {}
+
+for token,func in pairs(ClassAndRecordParser.tokenFuncs) do
+	ClassParser.tokenFuncs[token] = func
+end
+
 method grabClassParameters(parserParams,startI)
 	var openParen = loopUntilMatch(parserParams,startI,"%(",self.doNothing)
 	var closingParens = loopUntilMatchParams(parserParams,openParen + 1,"%)",self:returnFunctionAddingTextToParams(self.params))
