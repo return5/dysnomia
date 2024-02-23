@@ -2,7 +2,7 @@ var LambdaParser = require('parser.lambda.LambdaParser')
 
 class MultiStatementLambda(returnMode) :> LambdaParser
 
-function MultiStatementLambda:finishLambda(parserParams)
+method finishLambda(parserParams)
 	parserParams:getDysText():write(" end ")
 	parserParams:update(self.returnMode,1)
 	return self
@@ -12,11 +12,11 @@ var endingChars = {
 	["}"] = true,
 }
 
-function MultiStatementLambda:endingFunc(char)
+method endingFunc(char)
 	return endingChars[char]
 end
 
-function MultiStatementLambda:startParsing(parserParams,bodyStartI)
+method startParsing(parserParams,bodyStartI)
 	LambdaParser.startParsing(self,parserParams)
 	parserParams:updateSetI(self,bodyStartI + 1)
 	return self

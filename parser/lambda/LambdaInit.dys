@@ -26,4 +26,4 @@ method startParsing(returnMode,parserParams)
 	return multiStatementLambda(returnMode,parserParams,bodyStartI)
 end
 
-endCLass
+endClass

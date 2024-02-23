@@ -36,11 +36,11 @@ method secondPass(parserParams,name)
 	return self
 end
 
-global method writeAssignmentOfParams(dysText,param)
+method writeAssignmentOfParams(dysText,param)
 	dysText:writeFourArgs(param," = ",param,",")
 end
 
-global method writeParamAndCommaToDysText(dysText,param)
+method writeParamAndCommaToDysText(dysText,param)
 	dysText:writeTwoArgs(param,",")
 end
 
@@ -61,14 +61,14 @@ local function clearWord(word)
 end
 
 method returnFunctionAddingTextToParams(params)
-	return function(text,word)
+	return (text,word) -> {
 		if text and #text > 0 and text ~= "," then
 			word[#word + 1] = text
 		elseif text and #text > 0 and text == "," then
 			params[#params + 1] = concat(word)
 			clearWord(word)
 		end
-	end
+	}
 end
 
 
@@ -94,3 +94,4 @@ constructor(returnMode,startI)
     self.params = {}
 end
 
+endClass

@@ -109,10 +109,11 @@ method startParsing(parserParams)
 end
 
 constructor(returnMode)
+    super()
 	self.returnMode = returnMode
 	self.parensCount = 0
 	self.bracesCount = 0
 	self.bracketCount = 0
 end
 
-return LambdaParser
+endClass

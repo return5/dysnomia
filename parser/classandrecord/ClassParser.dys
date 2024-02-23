@@ -215,7 +215,7 @@ method writeSuperConstructor(parserParams,closingParens)
 	var openingParensSuper = loopUntilMatch(parserParams,closingParens + 1,"%(",self.doNothing)
 	var endSuper = loopThroughUntilClosingChar(openingParensSuper + 1,parserParams,"(",")",returnFunctionAddingTextToParams(superParams))
 	parserParams:getDysText():writeTwoArgs(self.parentName,":new(")
-	writeParamsToDysText(parserParams:getDysText(),superParams,self.writeParamAndCommaToDysText,(dys,par) -> dys:writeToArgs(par,"),self\n"))
+	writeParamsToDysText(parserParams:getDysText(),superParams,self.writeParamAndCommaToDysText,(dys,par) -> dys:writeTwoArgs(par,"),self\n"))
 	return endSuper
 end
 
@@ -229,6 +229,8 @@ method writeEndOfConstructor(parserParams)
 end
 
 method parseMethod(parserParams)
+	var newI = loopUntilMatch(parserParams,parserParams:getI() + 1,"%S",self.doNothing)
+	parserParams:updateSetI(self,newI + 1)
     parseInstanceOrStaticMethod(parserParams,self.class.staticMethods,".")
     return self
 end
