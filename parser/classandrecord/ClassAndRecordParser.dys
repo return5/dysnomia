@@ -36,11 +36,11 @@ method secondPass(parserParams,name)
 	return self
 end
 
-method writeAssignmentOfParams(dysText,param)
+global function ClassAndRecordParser.writeAssignmentOfParams(dysText,param)
 	dysText:writeFourArgs(param," = ",param,",")
 end
 
-method writeParamAndCommaToDysText(dysText,param)
+global function ClassAndRecordParser.writeParamAndCommaToDysText(dysText,param)
 	dysText:writeTwoArgs(param,",")
 end
 
