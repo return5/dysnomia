@@ -13,11 +13,11 @@ for token,func in pairs(TokenParser.tokenFuncs) do
 end
 
 
-method writeSelfInFrontOfMethodCall(i,dysText,regex)
+method writeSelfInFrontOfMethodCall(i,dysText,regex,pattern)
 	var prevI = loopBackUntilMatch(dysText,i - 1,"%S",self.doNothing)
 	var text = dysText:getAt(prevI)
-	if text ~= "." and text ~= ":" and not match(text,regex) and not match(text,"") then
-		dysText:replaceTextAt("" .. dysText:getAt(i),i)
+	if text ~= "." and text ~= ":" and not match(text,regex) and not match(text,pattern) then
+		dysText:replaceTextAt(pattern .. dysText:getAt(i),i)
 	end
 	return self
 end
@@ -26,8 +26,11 @@ method secondPass(parserParams,name)
 	var regex = name .. "[:%.]"
 	var dysText = parserParams:getDysText()
 	for i=self.startI,dysText:getLength(),1 do
-		if self.class.methods[dysText:getAt(i)] then
-			writeSelfInFrontOfMethodCall(i,dysText,regex)
+	    var text = dysText:getAt(i)
+		if self.class.methods[text] then
+			writeSelfInFrontOfMethodCall(i,dysText,regex,"self:")
+		elseif self.class.staticMethods[text] then
+	        writeSelfInFrontOfMethodCall(i,dysText,regex,"self.")
 		end
 	end
 	return self
@@ -68,19 +71,26 @@ method returnFunctionAddingTextToParams(params)
 	end
 end
 
-method parseMethod(parserParams)
+
+method parseInstanceOrStaticMethod(parserParams,methodsTable,del)
 	var newI = loopUntilMatch(parserParams,parserParams:getI() + 1,"%S",self.doNothing)
-	self.class.methods[parserParams:getAt(newI)] = true
-	parserParams:getDysText():writeFourArgs("function ",self.classOrRecordName,":",parserParams:getAt(newI))
+	methodsTable[parserParams:getAt(newI)] = true
+	parserParams:getDysText():writeFourArgs("function ",self.classOrRecordName,del,parserParams:getAt(newI))
 	parserParams:updateSetI(self,newI + 1)
 	return self
 end
 
-ClassAndRecordParser.tokenFuncs['method'] = ClassAndRecordParser.parseMethod
-
-method new(returnMode,startI)
-	return setmetatable({returnMode = returnMode,startI = startI,params = {}},self)
+method parseMethod(parserParams)
+    parseInstanceOrStaticMethod(parserParams,self.class.methods,":")
+    return self
 end
 
-return ClassAndRecordParser
+ClassAndRecordParser.tokenFuncs['method'] = ClassAndRecordParser.parseMethod
+
+constructor(returnMode,startI)
+    super()
+    self.returnMode = returnMode
+    self.startI = startI
+    self.params = {}
+end
 

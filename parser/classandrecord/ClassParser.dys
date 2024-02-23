@@ -228,7 +228,13 @@ method writeEndOfConstructor(parserParams)
 	return self
 end
 
+method parseMethod(parserParams)
+    parseInstanceOrStaticMethod(parserParams,self.class.staticMethods,".")
+    return self
+end
+
 ClassParser.tokenFuncs['endClass'] = ClassParser.parseEndClass
 ClassParser.tokenFuncs['constructor'] = ClassParser.parseConstructor
+ClassParser.tokenFuncs['static'] = ClassAndRecordParser.parseMethod
 
 endClass

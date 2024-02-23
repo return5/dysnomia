@@ -13,9 +13,9 @@ function creatParamDictionary(params)
 	return parentDict
 end
 
-method inherentMethods(parentMethods)
+method inherentMethods(selfMethods,parentMethods)
 	for m,_ in pairs(parentMethods) do
-		self.methods[m] = true
+		selfMethods[m] = true
 	end
 	return self
 end
@@ -26,8 +26,10 @@ constructor(name,params,parent)
     self.parent = parent
     self.paramDict = creatParamDictionary(params)
     self.methods = {}
+    self.staticMethods = {}
 	if parent then
-		self:inherentMethods(parent.methods)
+		self:inherentMethods(self.methods,parent.methods)
+		self:inherentMethods(self.staticMethods,parent.staticMethods)
 	end
 end
 
