@@ -5,14 +5,14 @@ var MultiStatementLambda = require('parser.lambda.MultiStatementLambda')
 class LambdaInit() :> TokenParser
 
 method singleStatementLambda(returnMode,parserParams,bodyStartI)
-	var singleStatementLambda = SingleStatementLambda:new(returnMode)
-	singleStatementLambda:startParsing(parserParams,bodyStartI)
+	var singleStatement = SingleStatementLambda:new(returnMode)
+	singleStatement:startParsing(parserParams,bodyStartI)
 	return self
 end
 
 method multiStatementLambda(returnMode,parserParams,bodyStartI)
-	var multiStatementLambda = MultiStatementLambda:new(returnMode)
-	multiStatementLambda:startParsing(parserParams,bodyStartI)
+	var multiStatement = MultiStatementLambda:new(returnMode)
+	multiStatement:startParsing(parserParams,bodyStartI)
 	return self
 end
 

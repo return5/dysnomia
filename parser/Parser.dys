@@ -19,7 +19,7 @@ method parseFile(tokenParser)
 		parserParameters.currentMode:parseInput(parserParameters)
 		index = parserParameters:getI()
 	end
-	var fileWriter = FileWriter(FileAttr(self.filePath,parserParameters:getDysText():getDysText()))
+	var fileWriter = FileWriter:new(FileAttr(self.filePath,parserParameters:getDysText():getDysText()))
 	fileWriter:writeFile()
 	return self
 end

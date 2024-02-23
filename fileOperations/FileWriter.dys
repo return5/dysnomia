@@ -6,6 +6,8 @@ var open = io.open
 var concat = table.concat
 var remove = os.remove
 
+FileWriter.files = {}
+
 method writeFile()
 	self.file.text[#self.file.text] = Config.newLine
 	var fileName = self.file.filePath .. ".lua"
