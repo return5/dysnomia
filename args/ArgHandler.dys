@@ -64,7 +64,7 @@ function getNewLine()
 	end
 end
 
-global function ArgHandler.printHelp()
+static method printHelp()
 	write("Project Dysnomia. Adding method \r\n")
 	for _,v in pairs(argOptions) do
 		write("\t",v.flag,"\t",v.descr,"\r\n")
@@ -129,7 +129,7 @@ argOptions = {
 	newLine = ArgOption("-nl [char(s)]","-nl:?s*(.+);","enter the newline character(s) which your OS uses.",newLineType)
 }
 
-global function ArgHandler.parseOptions(arg,preChecks)
+static method parseOptions(arg,preChecks)
 	var args = concat(arg,";")
 	var checkOs <mutable> = getOSType
 	var checkSep <mutable> = getSep

@@ -4,7 +4,7 @@ class TokenParser()
 
 TokenParser.returnMode = TokenParser
 
-global function TokenParser.doNothing() end
+static method doNothing() end
 
 method loopOverString(parserParams,start,endingQuoteMark)
 	var index <mutable> = start
@@ -51,7 +51,7 @@ method loopUntilMatchParams(parserParams,start,toFind,doFunc)
 	return index
 end
 
-global function TokenParser.trimString(str)
+static method trimString(str)
 	return match(str,"^%s*(.-)%s*$")
 end
 

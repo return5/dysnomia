@@ -46,7 +46,7 @@ end
 
 --when user passes in main file to start with, they might have included the .dys or .lua ending.
 --this messes up our existing code, so we remove that ending if it is there.
-global function FileReader.checkMainFile(file)
+static method checkMainFile(file)
 	if file:match("%.lua$") then
 		return file:match("(.+)%.lua$")
 	end

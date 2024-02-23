@@ -1,5 +1,0 @@
---create a very simple class example
-class SimpleClass(a,b)
-    method testing() io.write("testing\n") end
-
-endClass
