@@ -3,7 +3,7 @@ this is [Project dysnomia](https://github.com/return5/Project-Dysnomia) written 
 check [project dysnomia page](https://github.com/return5/Project-Dysnomia)
 
 
-this is currently a work in progress.
+this is currently a work in progress. this project is currently lagging behind the main lua project. 
 
 
 Project [Dysnomia](https://en.wikipedia.org/wiki/Dysnomia_(moon)): adding syntax and features on top of Lua 5.4
